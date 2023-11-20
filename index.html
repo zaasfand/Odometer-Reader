@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Head content... -->
+    <title>Odometer Reading</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+
+<h1>Odometer Reading</h1>
+
+<!-- Display video from the camera -->
+<video id="camera" autoplay playsinline></video>
+
+<br>
+<!-- Button to capture image -->
+<button id="captureButton">Capture Image</button>
+
+<!-- Display odometer reading -->
+<p id="odometerReading">Odometer Reading: <span id="readingValue">-</span></p>
+
+<!-- Display captured image -->
+<img id="capturedImage">
+
+<!-- Camera toggle button -->
+<button id="toggleCameraButton">Toggle Camera</button>
+
+<script src="https://cdn.rawgit.com/naptha/tesseract.js/1.0.10/dist/tesseract.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
