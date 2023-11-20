@@ -14,8 +14,8 @@ This web application allows users to capture and process odometer readings using
 1. Clone the repository to your local machine.
 
     ```bash
-    git clone https://github.com/your-username/odometer-reading-app.git
-    cd odometer-reading-app
+    [git clone https://github.com/your-username/odometer-reading-app.git](https://github.com/zaasfand/Odometer-Reader.git)
+    cd Odometer-Reader
     ```
 
 2. Open `index.html` in your web browser.
