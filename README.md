@@ -13,7 +13,7 @@ Odometer Reader is a simple application that allows users to read odometer readi
 
 ## Features
 
-- **Upload Picture**: Upload an image containing the odometer, and let the application automatically extract and display the reading.
+- **Take Picture of Odomoeter**: Click an image containing the odometer, and let the application automatically extract and display the reading.
 
 - **Take Selfie**: Open the camera to take a selfie with the odometer in view. The application will use image processing techniques to extract the reading.
 
