@@ -136,6 +136,7 @@
             justify-content: center;
             flex-direction: column;
             margin-right: 22px;
+            padding-top: 24px;
         }
         
         .camera-btn {
@@ -220,14 +221,20 @@
             margin-top: -40px;
         }
         
-        .capture-btn {
+        .capture-btn,
+        .capture-btn-odo {
             width: 35px;
             height: 35px;
             background-color: rgb(250, 250, 250);
             position: absolute;
             left: 47%;
-            bottom: 27%;
+            bottom: 28.5%;
             border-radius: 50%;
+        }
+        
+        .capture-btn-odo {
+            left: 16%;
+            bottom: 28.5%;
         }
         
         .image-preview {
@@ -244,13 +251,24 @@
             height: 130px;
             border-radius: 15px;
         }
+        
+        .camera-preview video {
+            border-radius: 0px;
+        }
         /* .camera-preview {
             display: none;
         } */
         
         @media screen and (max-width:991px) {
-            .capture-btn {
-                bottom: 29%;
+            .capture-btn,
+            .capture-btn-odo {
+                width: 30px;
+                height: 30px;
+                bottom: 30.2%;
+            }
+            .capture-btn-odo {
+                bottom: 30.2%;
+                left: 19%;
             }
         }
         
@@ -268,9 +286,14 @@
             .emer-steps {
                 font-size: 14px;
             }
-            .capture-btn {
-                width: 35px;
-                height: 35px;
+            .capture-btn,
+            .capture-btn-odo {
+                width: 30px;
+                height: 30px;
+            }
+            .capture-btn-odo {
+                left: 16%;
+                bottom: 30%;
             }
         }
         
@@ -301,7 +324,11 @@
                 margin-left: 0px;
             }
             .capture-btn {
-                bottom: 38%;
+                bottom: 37%;
+            }
+            .capture-btn-odo {
+                bottom: 59.5%;
+                left: 48%;
             }
         }
         
@@ -340,10 +367,14 @@
             .wheel-icon {
                 margin-bottom: 10px;
             }
-            .capture-btn {
-                bottom: 39%;
+            .capture-btn,
+            .capture-btn-odo {
+                bottom: 38%;
                 width: 28px;
                 height: 28px;
+            }
+            .capture-btn-odo {
+                bottom: 61%;
             }
         }
         
@@ -362,7 +393,21 @@
         
         @media screen and (max-width:356px) {
             .capture-btn {
-                bottom: 40%;
+                bottom: 38.2%;
+            }
+            .capture-btn-odo {
+                bottom: 61.2%;
+                left: 47%;
+            }
+        }
+        
+        @media screen and (max-width:355px) {
+            .capture-btn {
+                bottom: 39.2%;
+            }
+            .capture-btn-odo {
+                bottom: 61.8%;
+                left: 47%;
             }
         }
         
@@ -379,13 +424,52 @@
         
         @media screen and (max-width:345px) {
             .capture-btn {
-                bottom: 34.5%;
+                bottom: 33.9%;
+            }
+            .capture-btn-odo {
+                bottom: 53.5%;
+                left: 47%;
+            }
+        }
+        
+        @media screen and (max-width:334px) {
+            .capture-btn {
+                bottom: 33.2%;
+            }
+            .capture-btn-odo {
+                bottom: 54.2%;
+                left: 47%;
+            }
+        }
+        
+        @media screen and (max-width:316px) {
+            .capture-btn {
+                bottom: 34%;
+                left: 46%;
+            }
+            .capture-btn-odo {
+                bottom: 54.8%;
+                left: 46%;
             }
         }
         
         @media screen and (max-width:312px) {
-            .capture-btn {
-                bottom: 35%;
+            .capture-btn,
+            .capture-btn-odo {
+                bottom: 34.2%;
                 left: 46%;
+            }
+            .capture-btn-odo {
+                bottom: 55%;
+                left: 46%;
+            }
+        }
+        
+        @media screen and (max-width:302px) {
+            .capture-btn {
+                bottom: 33.5%;
+            }
+            .capture-btn-odo {
+                bottom: 53.7%;
             }
         }

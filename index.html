@@ -62,15 +62,15 @@
                                     <br><br>
                                     <div class="amer-btns-wrapper">
                                         <div class="text-center system-brows-btn">
-                                            <button class="btn amer-btns" onclick="uploadFromSystem()" id="system-upload"><i class="fa-regular fa-image"></i></button>
-                                            <div id="preview" class="image-preview" onclick="uploadFromSystem()"></div>
+                                            <button class="btn amer-btns" onclick="openCameraOdometer()" id="open-odometer-camera"><i class="fa-regular fa-image"></i></button>
+                                            <div id="OdometercameraPreview" class="camera-preview"></div>
+                                            <button class="btn amer-btns capture-btn-odo" onclick="captureImageOdometer()" id="capture-button-odo-meter" style="display: none;"></button>
+                                            <img id="capturedImageOdometer" class="captured-image" onclick="toggleCameraOdometer()" style="display: none;">
                                             <p class="emer-steps">Step 01: Upload Odometer Picture</p>
                                             <div class="amer-steps-content-wrapper">
                                                 <p class="amer-steps-content">Photo should clearly visible and make sure your flashlight is on</p>
                                             </div>
                                         </div>
-
-                                        
                                         <div class="camer-wrapper text-center camera-btn">
                                             <button class="btn amer-btns" onclick="openCamera()" id="open-camera"><i class="fa-solid fa-camera"></i></button>
                                             <div id="cameraPreview" class="camera-preview"></div>
