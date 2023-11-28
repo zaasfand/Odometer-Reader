@@ -192,7 +192,6 @@ function performOCR(imageData, callback) {
         'eng', // Language code (English in this case)
         { logger: info => console.log(info) } // Logger function to view progress (optional)
     ).then(response => {
-    console.log("🚀 ~ file: script.js:195 ~ performOCR ~ response:", response)
     callback(response.text)
     }).catch(error => {
         // Handle OCR error here
@@ -215,8 +214,7 @@ function getQuote() {
         const manualReading = document.getElementById('manualReadingInput').value;
 
         const extractedReading = odometerText.match(/\d+/g);
-        console.log("🚀 ~ file: script.js:217 ~ extractedReading:", extractedReading[0])
-        console.log("🚀 ~ file: script.js:217 ~ extractedReading:", extractedReading.includes(enteredMiles))
+
         if(!extractedReading.includes(enteredMiles)){
             showRetryModal();
         }else{
@@ -237,7 +235,6 @@ function getQuote() {
                 contentType: false,
                 success: function (response) {
                     // Handle the server response if needed
-                    console.log('Data sent successfully:', response);
                     alert('Successfully uploaded the reading!');
                     location.reload(); // Attempt to close the current tab
                 },
