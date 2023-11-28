@@ -185,31 +185,106 @@ function toggleCameraOdometer() {
     }
 };
 
+// Function to perform OCR using Tesseract.js
+function performOCR(imageData, callback) {
+    Tesseract.recognize(
+        imageData,
+        'eng', // Language code (English in this case)
+        { logger: info => console.log(info) } // Logger function to view progress (optional)
+    ).then(response => {
+    console.log("🚀 ~ file: script.js:195 ~ performOCR ~ response:", response)
+    callback(response.text)
+    }).catch(error => {
+        // Handle OCR error here
+        console.error('OCR Error:', error);
+        callback('');
+    });
+}
+
+// Updated getQuote function
 function getQuote() {
     // Gather all the necessary data
     const enteredMiles = document.querySelector('.mile-field').value;
     const capturedImage = document.getElementById('capturedImage').src;
     const capturedImageOdometer = document.getElementById('capturedImageOdometer').src;
 
-    // Create a FormData object to send data as a multipart/form-data
-    const formData = new FormData();
-    formData.append('enteredMiles', enteredMiles);
-    formData.append('capturedImage', capturedImage);
-    formData.append('capturedImageOdometer', capturedImageOdometer);
+    // Perform OCR on the odometer image
+    performOCR(capturedImageOdometer, function (odometerText) {
 
-    // Send data to the server using AJAX
-    $.ajax({
-        type: 'POST',
-        url: 'backend.php', // Update with the correct URL
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            // Handle the server response if needed
-            console.log('Data sent successfully:', response);
-        },
-        error: function(error) {
-            console.error('Error sending data to the server:', error);
+        // Extracted manual reading from user input (replace with your actual logic)
+        const manualReading = document.getElementById('manualReadingInput').value;
+
+        const extractedReading = odometerText.match(/\d+/g);
+        console.log("🚀 ~ file: script.js:217 ~ extractedReading:", extractedReading[0])
+        console.log("🚀 ~ file: script.js:217 ~ extractedReading:", extractedReading.includes(enteredMiles))
+        if(!extractedReading.includes(enteredMiles)){
+            showRetryModal();
+        }else{
+            // Create a FormData object to send data as a multipart/form-data
+            const formData = new FormData();
+            formData.append('enteredMiles', enteredMiles);
+            formData.append('capturedImage', capturedImage);
+            formData.append('capturedImageOdometer', capturedImageOdometer);
+            formData.append('manualReading', manualReading);
+            formData.append('odometerText', odometerText); // Include OCR result in the request
+
+            // Send data to the server using AJAX
+            $.ajax({
+                type: 'POST',
+                url: 'backend.php', // Update with the correct URL
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    // Handle the server response if needed
+                    console.log('Data sent successfully:', response);
+                    alert('Successfully uploaded the reading!');
+                    location.reload(); // Attempt to close the current tab
+                },
+                error: function (error) {
+                    console.error('Error sending data to the server:', error);
+                }
+            });
         }
+
     });
+}
+
+
+// Replace the alert with a custom modal
+function showRetryModal() {
+    // Create the modal HTML
+    const modalHTML = `
+        <div class="modal fade" id="retryModal" tabindex="-1" role="dialog" aria-labelledby="retryModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="retryModalLabel">Retry</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        The reading from odometer does not match the Enter Miles value.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="retry()">Retry</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Append the modal to the body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Show the modal
+    $('#retryModal').modal('show');
+}
+
+
+// Function to retry (reload the current page)
+function retry() {
+    $('#retryModal').modal('hide'); // Hide the modal
+    location.reload(); // Reload the current page
 }
