@@ -184,3 +184,32 @@ function toggleCameraOdometer() {
         isCameraShown = true;
     }
 };
+
+function getQuote() {
+    // Gather all the necessary data
+    const enteredMiles = document.querySelector('.mile-field').value;
+    const capturedImage = document.getElementById('capturedImage').src;
+    const capturedImageOdometer = document.getElementById('capturedImageOdometer').src;
+
+    // Create a FormData object to send data as a multipart/form-data
+    const formData = new FormData();
+    formData.append('enteredMiles', enteredMiles);
+    formData.append('capturedImage', capturedImage);
+    formData.append('capturedImageOdometer', capturedImageOdometer);
+
+    // Send data to the server using AJAX
+    $.ajax({
+        type: 'POST',
+        url: 'backend.php', // Update with the correct URL
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            // Handle the server response if needed
+            console.log('Data sent successfully:', response);
+        },
+        error: function(error) {
+            console.error('Error sending data to the server:', error);
+        }
+    });
+}
