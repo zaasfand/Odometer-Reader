@@ -6,73 +6,230 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelector('.btn-primary').click();
 });
 let mediaStream;
+let moreThenOnePerson = false;
+let stopTracking;
 
 function openCamera() {
 
+    document.getElementById("capture-button").style.display = 'block'   
+
     const constraints = {
         video: true,
-
-
     };
+    stopTracking = false
 
     navigator.mediaDevices.getUserMedia(constraints)
-        .then(function(stream) {
-
-            mediaStream = stream;
+        .then(function (stream) {
             const video = document.createElement('video');
             video.srcObject = stream;
             video.autoplay = true;
+            video.id = 'videoPlayer'
+            video.style.position = 'relative'
 
             document.getElementById("open-camera").style.display = "none";
-            document.getElementById("capture-button").style.display = "block";
-            // document.getElementById("cameraPreview").style.display = "block";
+
             const previewContainer = document.getElementById('cameraPreview');
-            previewContainer.innerHTML = ''; // Clear any existing content
-            previewContainer.appendChild(video); // Add the video stream to the preview container
+            previewContainer.innerHTML = '';
 
-        })
-        .catch(function(error) {
-            console.error('Error accessing the camera:', error);
-        });
-};
 
-function captureImage() {
-    const constraints = {
-        video: true,
-    };
 
-    navigator.mediaDevices.getUserMedia(constraints)
-        .then(function(stream) {
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.onloadedmetadata = function(e) {
-                video.width = this.videoWidth;
-                video.height = this.videoHeight;
 
-                const canvas = document.createElement('canvas');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            previewContainer.appendChild(video);
 
-                const imageUrl = canvas.toDataURL('image/jpeg');
+            const cameraPreviewDiv = document.getElementById('cameraPreview').getBoundingClientRect();
 
-                const capturedImage = document.getElementById('capturedImage');
-                capturedImage.src = imageUrl;
-                capturedImage.style.display = 'block';
+            // Create a div for the overlay
+            const overlay = document.createElement('div');
+            overlay.id = 'ovalOverlay';
+            overlay.style.position = 'absolute';
+            overlay.style.width = cameraPreviewDiv.width/2 + 'px'; // Adjust the width as needed
+            overlay.style.height = cameraPreviewDiv.height/1.5 + 'px'; // Adjust the height as needed
+            overlay.style.border = '2px dashed black'; // Border for visualization
+            overlay.style.pointerEvents = 'none'; // Allow clicks to go through the overlay
+            overlay.style.pointerEvents = 'none'; // Allow clicks to go through the overlay            
+            // Add border-radius for oval shape
+            overlay.style.borderRadius = '50%';
 
-                document.getElementById("cameraPreview").style.display = "none";
-                document.getElementById("capture-button").style.display = "none";
+            var viewportWidth = window.innerWidth;
 
-                stream.getTracks().forEach(track => track.stop());
+            if(viewportWidth < 768){
+                overlay.style.left = '160px';
+                overlay.style.top = '723px';
+            }else{
+                overlay.style.left = '621px';
+                overlay.style.top = '300px';
+            }
+
+            
+            // Optionally, you can set the background color to make it more visually appealing
+            overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.5)'; // Adjust the color and opacity as needed
+            
+            previewContainer.appendChild(overlay);
+            const ovalOverlayCreated = document.getElementById('ovalOverlay').getBoundingClientRect();
+
+
+            // Wait for the video to be loaded and start playing
+            video.onloadedmetadata = function () {
+                // Load face-api.js models before using face detection
+                Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+                    faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+                    faceapi.nets.ageGenderNet.loadFromUri('/models')
+                    // Add more models if needed
+                ])
+                    .then(function () {
+                        // Now that the models are loaded, you can start face tracking
+                        trackFace(video);
+                    })
+                    .catch(function (error) {
+                        console.error('Error loading face-api.js models:', error);
+                    });
             };
-            video.play();
         })
-        .catch(function(error) {
+        .catch(function (error) {
             console.error('Error accessing the camera:', error);
-            // Display an error message or handle the error accordingly
         });
-};
+}
+
+function trackFace(video) {
+    if(stopTracking == false){
+        const cameraPreviewDiv = document.getElementById('videoPlayer').getBoundingClientRect();
+
+        // Create a canvas for drawing face bounding boxes
+        const canvas = document.createElement('canvas');
+        canvas.width = cameraPreviewDiv.width;
+        canvas.height = cameraPreviewDiv.height;
+        canvas.id = 'faceTrack'
+    
+    
+    
+        // Append the canvas to the cameraPreview div
+        document.getElementById('cameraPreview').appendChild(canvas);
+        var faceTrack   = document.getElementById('faceTrack')
+        var videoPlayer = document.getElementById('videoPlayer')
+    
+        videoPlayer.style.position = 'absolute'
+    
+        // Style the canvas and position it over the video
+        faceTrack.style.position = 'relative';
+    
+    
+        var viewportWidth = window.innerWidth;
+        if (viewportWidth < 768) {
+            // Perform actions for devices that are not desktop
+            console.log("This is not a desktop device.");
+            faceTrack.style.top = '-15px';
+            faceTrack.style.left = '-15px';
+    
+        }
+        
+        // Get the context of the canvas for drawing
+        const ctx = canvas.getContext('2d');
+        var interval = 100
+    
+        // Start face detection and tracking
+        setInterval(async () => {
+            // Detect faces in the current video frame
+            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withAgeAndGender();
+    
+            const moreThenOnePerson = document.createElement('p');
+            moreThenOnePerson.innerHTML = 'More then one person detected';
+            moreThenOnePerson.style.color = 'red'
+            moreThenOnePerson.style.position = 'relative'
+            moreThenOnePerson.id = 'moreThenOnePerson'
+    
+            if(detections.length > 1){
+                const check = document.getElementById('moreThenOnePerson');
+                if (check) {
+                    check.style.display = 'block';
+                }else{
+                    document.getElementById('cameraPreview').appendChild(moreThenOnePerson);
+                }
+    
+            }else{
+                const check = document.getElementById('moreThenOnePerson');
+                if (check) {
+                    check.style.display = 'none';
+                }
+                // captureImage(videoPlayer)
+                //TODO stop the execution of this whole function here
+            }
+    
+            // Ensure that video dimensions are available
+            if (video.videoWidth > 0 && video.videoHeight > 0) {
+                // Size the canvas to the video dimensions
+                canvas.width = '160';
+                canvas.height = '130';
+            
+    
+                // Clear previous drawings
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+                // Draw face bounding boxes
+                faceapi.draw.drawDetections(canvas, faceapi.resizeResults(detections, { width: '160', height: '130' }));
+    
+                // Draw landmarks (optional)
+                // faceapi.draw.drawFaceLandmarks(canvas, faceapi.resizeResults(detections, { width: '160', height: '130' }));
+    
+                // Draw preview at the center of the first detected face (if available)
+                if (detections.length > 0) {
+                    const face = detections[0].detection.box;
+                    const previewSize = 100; // Set the preview size as needed
+    
+                    const previewX = face.x + face.width / 2 - previewSize / 2;
+                    const previewY = face.y + face.height / 2 - previewSize / 2;
+    
+                    // Draw a preview box centered on the face
+                    ctx.strokeStyle = 'red'; // Set the border color
+                    ctx.lineWidth = 2; // Set the border width
+                    ctx.strokeRect(previewX, previewY, previewSize, previewSize);
+                }
+            }
+        }, interval); // Adjust the interval as needed
+    }
+}
+
+
+function captureImage(video) {
+    stopTracking = true
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const imageUrl = canvas.toDataURL('image/jpeg');
+
+    const capturedImage = document.getElementById('capturedImage');
+    capturedImage.src = imageUrl;
+    capturedImage.style.display = 'block';
+
+    document.getElementById("cameraPreview").style.display = "none";
+    // Add face detection logic here
+    faceapi.detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks()
+        .then((faces) => {
+            if (faces.length > 0) {
+                console.log('Face detected!');
+                // Add your logic when a face is detected
+                document.getElementById("getQuote").disabled = false;
+                document.getElementById("noFaceDetected").style.display = 'none';
+
+            } else {
+                console.log('No face detected.');
+                // Add your logic when no face is detected
+                const noFaceDetected = document.createElement('p');
+                noFaceDetected.innerHTML = 'No face detected, tap on the image to open camera again.';
+                noFaceDetected.style.color = 'red'
+                noFaceDetected.style.position = 'relative'
+                noFaceDetected.id = 'noFaceDetected'
+                const selfie = document.getElementById('selfie');
+                document.getElementById("getQuote").disabled = true;
+                selfie.appendChild(noFaceDetected)
+            }
+        });
+}
+
 
 
 
@@ -94,12 +251,17 @@ function toggleCamera() {
     if (isCameraShown) {
         document.getElementById("cameraPreview").style.display = "none";
         document.getElementById("capturedImage").style.display = "block";
+        
         isCameraShown = false;
     } else {
         document.getElementById("cameraPreview").style.display = "block";
         document.getElementById("capturedImage").style.display = "none";
-        document.getElementById("capture-button").style.display = "block";
+        // document.getElementById("capture-button").style.display = "block";
+        document.getElementById("noFaceDetected").style.display = "none";
+
         isCameraShown = true;
+
+
     }
 };
 // Odometercamera
@@ -288,7 +450,12 @@ function openCameraOdometer() {
             window.addEventListener('resize', applyResponsiveStyles);
 
             document.getElementById("open-odometer-camera").style.display = "none";
-            document.getElementById("capture-button-odo-meter").style.display = "block";
+            // document.getElementById("capture-button-odo-meter").style.display = "block";
+
+            setTimeout(function() {
+                captureImageOdometer(video); // Pass the video element to captureImage
+            }, 5000);
+
 
         })
         .catch(function(error) {
@@ -345,9 +512,11 @@ function captureImageOdometer() {
                 capturedImage.style.display = 'block';
 
                 document.getElementById("OdometercameraPreview").style.display = "none";
-                document.getElementById("capture-button-odo-meter").style.display = "none";
+                // document.getElementById("capture-button-odo-meter").style.display = "none";
 
                 stream.getTracks().forEach(track => track.stop());
+
+                processOdometerReading()
             };
             video.play();
         })
@@ -366,9 +535,13 @@ function toggleCameraOdometer() {
     } else {
         document.getElementById("OdometercameraPreview").style.display = "block";
         document.getElementById("capturedImageOdometer").style.display = "none";
-        document.getElementById("capture-button-odo-meter").style.display = "block";
+        // document.getElementById("capture-button-odo-meter").style.display = "block";
         isCameraShown = true;
     }
+    openCameraOdometer()
+
+    document.getElementById("errorInOdometer").innerHTML = ''
+    document.getElementById("errorInOdometer").classList.remove('error-message');
 }
 
 
@@ -385,6 +558,20 @@ function performOCR(imageData, callback) {
         console.error('OCR Error:', error);
         callback('');
     });
+}
+
+function processOdometerReading() {
+    const capturedImageOdometer = document.getElementById('capturedImageOdometer').src;
+
+    performOCR(capturedImageOdometer, function (odometerText) {
+        var textFound = /^\d{6}$/.test(parseInt(odometerText))
+        if(textFound == false){
+            odometerReadingError = 'No valid scan detected, click on the image to open camera again.'
+            document.getElementById("errorInOdometer").innerHTML = odometerReadingError
+            document.getElementById("errorInOdometer").classList.add('error-message');
+        }
+    })
+
 }
 
 // Updated getQuote function
