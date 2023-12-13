@@ -11,7 +11,6 @@ let stopTracking;
 
 function openCamera() {
 
-    document.getElementById("capture-button").style.display = 'block'   
 
     const constraints = {
         video: true,
@@ -27,9 +26,11 @@ function openCamera() {
             video.style.position = 'relative'
 
             document.getElementById("open-camera").style.display = "none";
+            document.getElementById("capture-button").style.display = 'block'   
+            document.getElementById("ovalOverlay").style.display = 'block'   
 
             const previewContainer = document.getElementById('cameraPreview');
-            previewContainer.innerHTML = '';
+            // previewContainer.innerHTML = '';
 
 
 
@@ -37,36 +38,6 @@ function openCamera() {
             previewContainer.appendChild(video);
 
             const cameraPreviewDiv = document.getElementById('cameraPreview').getBoundingClientRect();
-
-            // Create a div for the overlay
-            const overlay = document.createElement('div');
-            overlay.id = 'ovalOverlay';
-            overlay.style.position = 'absolute';
-            overlay.style.width = cameraPreviewDiv.width/2 + 'px'; // Adjust the width as needed
-            overlay.style.height = cameraPreviewDiv.height/1.5 + 'px'; // Adjust the height as needed
-            overlay.style.border = '2px dashed black'; // Border for visualization
-            overlay.style.pointerEvents = 'none'; // Allow clicks to go through the overlay
-            overlay.style.pointerEvents = 'none'; // Allow clicks to go through the overlay            
-            // Add border-radius for oval shape
-            overlay.style.borderRadius = '50%';
-
-            var viewportWidth = window.innerWidth;
-
-            if(viewportWidth < 768){
-                overlay.style.left = '160px';
-                overlay.style.top = '723px';
-            }else{
-                overlay.style.left = '621px';
-                overlay.style.top = '300px';
-            }
-
-            
-            // Optionally, you can set the background color to make it more visually appealing
-            overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.5)'; // Adjust the color and opacity as needed
-            
-            previewContainer.appendChild(overlay);
-            const ovalOverlayCreated = document.getElementById('ovalOverlay').getBoundingClientRect();
-
 
             // Wait for the video to be loaded and start playing
             video.onloadedmetadata = function () {
@@ -95,34 +66,23 @@ function trackFace(video) {
     if(stopTracking == false){
         const cameraPreviewDiv = document.getElementById('videoPlayer').getBoundingClientRect();
 
-        // Create a canvas for drawing face bounding boxes
-        const canvas = document.createElement('canvas');
-        canvas.width = cameraPreviewDiv.width;
-        canvas.height = cameraPreviewDiv.height;
-        canvas.id = 'faceTrack'
-    
+
+
     
     
         // Append the canvas to the cameraPreview div
-        document.getElementById('cameraPreview').appendChild(canvas);
-        var faceTrack   = document.getElementById('faceTrack')
+        // document.getElementById('cameraPreview').appendChild(canvas);
+        var canvas   = document.getElementById('faceTrack')
         var videoPlayer = document.getElementById('videoPlayer')
+        console.log("🚀 ~ file: script.js:110 ~ trackFace ~ videoPlayer:", videoPlayer)
     
-        videoPlayer.style.position = 'absolute'
+        canvas.width = cameraPreviewDiv.width;
+        canvas.height = cameraPreviewDiv.height;
+        // videoPlayer.style.position = 'absolute'
     
         // Style the canvas and position it over the video
-        faceTrack.style.position = 'relative';
+        faceTrack.style.position = 'absolute';
     
-    
-        var viewportWidth = window.innerWidth;
-        if (viewportWidth < 768) {
-            // Perform actions for devices that are not desktop
-            console.log("This is not a desktop device.");
-            faceTrack.style.top = '-15px';
-            faceTrack.style.left = '-15px';
-    
-        }
-        
         // Get the context of the canvas for drawing
         const ctx = canvas.getContext('2d');
         var interval = 100
@@ -158,15 +118,15 @@ function trackFace(video) {
             // Ensure that video dimensions are available
             if (video.videoWidth > 0 && video.videoHeight > 0) {
                 // Size the canvas to the video dimensions
-                canvas.width = '160';
-                canvas.height = '130';
+                // canvas.width = '160';
+                // canvas.height = '130';
             
     
                 // Clear previous drawings
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
     
                 // Draw face bounding boxes
-                faceapi.draw.drawDetections(canvas, faceapi.resizeResults(detections, { width: '160', height: '130' }));
+                faceapi.draw.drawDetections(canvas, faceapi.resizeResults(detections, { width: canvas.width, height: canvas.height }));
     
                 // Draw landmarks (optional)
                 // faceapi.draw.drawFaceLandmarks(canvas, faceapi.resizeResults(detections, { width: '160', height: '130' }));
@@ -205,6 +165,7 @@ function captureImage(video) {
     capturedImage.style.display = 'block';
 
     document.getElementById("cameraPreview").style.display = "none";
+    document.getElementById("capture-button").style.display = "none";
     // Add face detection logic here
     faceapi.detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks()
@@ -256,7 +217,7 @@ function toggleCamera() {
     } else {
         document.getElementById("cameraPreview").style.display = "block";
         document.getElementById("capturedImage").style.display = "none";
-        // document.getElementById("capture-button").style.display = "block";
+        document.getElementById("capture-button").style.display = "block";
         document.getElementById("noFaceDetected").style.display = "none";
 
         isCameraShown = true;
@@ -264,99 +225,6 @@ function toggleCamera() {
 
     }
 };
-// Odometercamera
-
-// function openCameraOdometer() {
-//     const constraints = {
-//         video: true,
-//     };
-
-//     navigator.mediaDevices.getUserMedia(constraints)
-//         .then(function(stream) {
-//             mediaStream = stream;
-//             const video = document.createElement('video');
-//             video.srcObject = stream;
-//             video.autoplay = true;
-
-//             // Create a div for the overlay
-//             const overlay = document.createElement('div');
-//             overlay.style.position = 'absolute';
-//             overlay.style.width = '135px'; // Adjust the width as needed
-//             overlay.style.height = '60px'; // Adjust the height as needed
-//             overlay.style.border = '2px dashed white'; // Border for visualization
-//             overlay.style.top = '55%';
-//             overlay.style.left = '9.5%';
-          
-//             overlay.style.pointerEvents = 'none'; // Allow clicks to go through the overlay
-
-//             // Append the video and overlay to the preview container
-//             const previewContainer = document.getElementById('OdometercameraPreview');
-//             previewContainer.innerHTML = ''; // Clear any existing content
-//             previewContainer.appendChild(video);
-//             previewContainer.appendChild(overlay);
-
-//             document.getElementById("open-odometer-camera").style.display = "none";
-//             document.getElementById("capture-button-odo-meter").style.display = "block";
-
-//         })
-//         .catch(function(error) {
-//             console.error('Error accessing the camera:', error);
-//         });
-// }
-
-
-// function captureImageOdometer() {
-//     const constraints = {
-//         video: true,
-//     };
-
-//     navigator.mediaDevices.getUserMedia(constraints)
-//         .then(function(stream) {
-//             const video = document.createElement('video');
-//             video.srcObject = stream;
-//             video.onloadedmetadata = function(e) {
-//                 video.width = this.videoWidth;
-//                 video.height = this.videoHeight;
-
-//                 const canvas = document.createElement('canvas');
-//                 canvas.width = video.videoWidth;
-//                 canvas.height = video.videoHeight;
-//                 const ctx = canvas.getContext('2d');
-//                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-//                 const imageUrl = canvas.toDataURL('image/jpeg');
-
-//                 const capturedImage = document.getElementById('capturedImageOdometer');
-//                 capturedImage.src = imageUrl;
-//                 capturedImage.style.display = 'block';
-
-//                 document.getElementById("OdometercameraPreview").style.display = "none";
-//                 document.getElementById("capture-button-odo-meter").style.display = "none";
-
-//                 stream.getTracks().forEach(track => track.stop());
-//             };
-//             video.play();
-//         })
-//         .catch(function(error) {
-//             console.error('Error accessing the camera:', error);
-//             // Display an error message or handle the error accordingly
-//         });
-// };
-
-
-// function toggleCameraOdometer() {
-//     if (isCameraShown) {
-//         document.getElementById("OdometercameraPreview").style.display = "none";
-//         document.getElementById("capturedImageOdometer").style.display = "block";
-//         isCameraShown = false;
-//     } else {
-//         document.getElementById("OdometercameraPreview").style.display = "block";
-//         document.getElementById("capturedImageOdometer").style.display = "none";
-//         document.getElementById("capture-button-odo-meter").style.display = "block";
-//         isCameraShown = true;
-//     }
-// };
-
 
 function openCameraOdometer() {
     const constraints = {
@@ -371,92 +239,14 @@ function openCameraOdometer() {
             const video = document.createElement('video');
             video.srcObject = stream;
             video.autoplay = true;
+            video.id = 'odometerVideoPlayer';
 
-            // Create a div for the overlay
-            const overlay = document.createElement('div');
-            overlay.id = 'rectangleOverlay';
-            overlay.style.position = 'absolute';
-            overlay.style.width = '135px'; // Adjust the width as needed
-            overlay.style.height = '50px'; // Adjust the height as needed
-            overlay.style.border = '2px dashed white'; // Border for visualization
-            overlay.style.top = '55%';
-            overlay.style.left = '10%';
-            overlay.style.pointerEvents = 'none'; // Allow clicks to go through the overlay
-
-            // Append the video and overlay to the preview container
             const previewContainer = document.getElementById('OdometercameraPreview');
-            previewContainer.innerHTML = ''; // Clear any existing content
+            // previewContainer.innerHTML = ''; // Clear any existing content
             previewContainer.appendChild(video);
-            previewContainer.appendChild(overlay);
-
-
-            const applyResponsiveStyles = function() {
-                const rectangleOverlay = document.getElementById('rectangleOverlay');
-                
-                const windowWidth = window.innerWidth;
-                
-                if (windowWidth <= 991  && windowWidth >= 983) {
-                    // Adjust styles for smaller screens (tablets and below)
-                    rectangleOverlay.style.width = '95px';
-                    rectangleOverlay.style.height = '30px';
-                    rectangleOverlay.style.top = '57%';
-                    rectangleOverlay.style.left = '15.5%';
-                }
-                else if (windowWidth < 983 && windowWidth > 500) {
-                    // Adjust styles for smaller screens (tablets and below)
-                    rectangleOverlay.style.width = '95px';
-                    rectangleOverlay.style.height = '30px';
-                    rectangleOverlay.style.top = '57%';
-                    rectangleOverlay.style.left = '12.5%';
-                }
-                else if (windowWidth < 768 && windowWidth > 500) {
-                    // Adjust styles for smaller screens (tablets and below)
-                    rectangleOverlay.style.width = '95px';
-                    rectangleOverlay.style.height = '30px';
-                    rectangleOverlay.style.top = '32.5%';
-                    rectangleOverlay.style.left = '40.5%';
-                } else if (windowWidth <= 500 && windowWidth > 400) {
-                    // Adjust styles for smaller screens (tablets and below)
-                    rectangleOverlay.style.width = '95px';
-                    rectangleOverlay.style.height = '30px';
-                    rectangleOverlay.style.top = '30.5%';
-                    rectangleOverlay.style.left = '39%';
-                } 
-                
-                else if (windowWidth <= 400 && windowWidth >= 346) {
-                    // Adjust styles for smaller screens (tablets and below)
-                    rectangleOverlay.style.width = '95px';
-                    rectangleOverlay.style.height = '30px';
-                    rectangleOverlay.style.top = '30.5%';
-                    rectangleOverlay.style.left = '37%';
-                }
-                else if (windowWidth <= 346) {
-                    // Adjust styles for smaller screens (tablets and below)
-                    rectangleOverlay.style.width = '95px';
-                    rectangleOverlay.style.height = '30px';
-                    rectangleOverlay.style.top = '39.5%';
-                    rectangleOverlay.style.left = '37%';
-                }else {
-                    // Default styles for larger screens
-                    rectangleOverlay.style.width = '135px';
-                    rectangleOverlay.style.height = '50px';
-                    rectangleOverlay.style.top = '55%';
-                    rectangleOverlay.style.left = '10%';
-                }
-            };
-
-            // Initial application of styles
-            applyResponsiveStyles();
-            window.addEventListener('resize', applyResponsiveStyles);
 
             document.getElementById("open-odometer-camera").style.display = "none";
-            // document.getElementById("capture-button-odo-meter").style.display = "block";
-
-            setTimeout(function() {
-                captureImageOdometer(video); // Pass the video element to captureImage
-            }, 5000);
-
-
+            document.getElementById("capture-button-odo-meter").style.display = "block";
         })
         .catch(function(error) {
             console.error('Error accessing the camera:', error);
@@ -476,17 +266,20 @@ function captureImageOdometer() {
                 video.width = this.videoWidth;
                 video.height = this.videoHeight;
 
+                var rectangleOverlay = document.getElementById('rectangleOverlay').getBoundingClientRect();
+                console.log("🚀 ~ file: script.js:434 ~ .then ~ rectangleOverlay:", rectangleOverlay)
+
                 // Percentage values for overlay position
                 const overlayTopPercentage = 30;
-                const overlayLeftPercentage = 23;
+                const overlayLeftPercentage = 35;
 
                 // Calculate pixel values based on percentages
-                const cropX = (overlayLeftPercentage / 100) * video.videoWidth;
+                const cropX = (overlayLeftPercentage / 300) * video.videoWidth;
                 const cropY = (overlayTopPercentage / 100) * video.videoHeight;
 
                 // Adjust the crop region based on your overlay dimensions
-                const cropWidth = 335; // Adjust as needed
-                const cropHeight = 90; // Adjust as needed
+                const cropWidth = 520; // Adjust as needed
+                const cropHeight = 220; // Adjust as needed
 
                 const canvas = document.createElement('canvas');
                 canvas.width = cropWidth;
@@ -512,7 +305,7 @@ function captureImageOdometer() {
                 capturedImage.style.display = 'block';
 
                 document.getElementById("OdometercameraPreview").style.display = "none";
-                // document.getElementById("capture-button-odo-meter").style.display = "none";
+                document.getElementById("capture-button-odo-meter").style.display = "none";
 
                 stream.getTracks().forEach(track => track.stop());
 
@@ -538,6 +331,9 @@ function toggleCameraOdometer() {
         // document.getElementById("capture-button-odo-meter").style.display = "block";
         isCameraShown = true;
     }
+    var odometerVideoPlayer = document.getElementById('odometerVideoPlayer');
+    odometerVideoPlayer.remove();
+
     openCameraOdometer()
 
     document.getElementById("errorInOdometer").innerHTML = ''
@@ -565,6 +361,7 @@ function processOdometerReading() {
 
     performOCR(capturedImageOdometer, function (odometerText) {
         var textFound = /^\d{6}$/.test(parseInt(odometerText))
+        console.log("🚀 ~ file: script.js:530 ~ textFound:", textFound)
         if(textFound == false){
             odometerReadingError = 'No valid scan detected, click on the image to open camera again.'
             document.getElementById("errorInOdometer").innerHTML = odometerReadingError

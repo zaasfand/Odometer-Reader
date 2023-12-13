@@ -68,10 +68,15 @@
                                     <div class="amer-btns-wrapper">
                                         <div class="text-center system-brows-btn">
                                             <button class="btn amer-btns" onclick="openCameraOdometer()" id="open-odometer-camera"><i class="fa-regular fa-image"></i></button>
-                                            <div id="OdometercameraPreview" class="camera-preview"></div>
+                                            <div id="OdometercameraPreview" class="camera-preview" style="position: relative">
+                                                <span id="rectangleOverlay">
+                                                </span>
+                                            </div>
                                             <!-- <button class="btn amer-btns capture-btn-odo" onclick="captureImageOdometer()" id="capture-button-odo-meter" style="display: none;"></button> -->
                                             <img id="capturedImageOdometer" class="captured-image" onclick="toggleCameraOdometer()" style="display: none;">
-                                            <br>
+                                            <button  onclick="captureImageOdometer()" id="capture-button-odo-meter" style="display: none;">
+                                                <i class="fas fa-camera"  style="font-size: 20px"></i>
+                                            </button>
                                             <p class="emer-steps">Step 01: Upload Odometer Picture</p>
                                             <div class="amer-steps-content-wrapper">
                                                 <p class="amer-steps-content">Photo should clearly visible and make sure your flashlight is on</p>
@@ -91,7 +96,10 @@
 
                                         <div class="camer-wrapper text-center camera-btn" id='selfie'>
                                             <button class="btn amer-btns" onclick="openCamera()" id="open-camera"><i class="fa-solid fa-camera"></i></button>
-                                            <div id="cameraPreview" class="camera-preview">
+                                            <div id="cameraPreview" class="camera-preview" style="position: relative">
+                                                <span id="ovalOverlay">
+                                                </span>
+                                                <canvas id="faceTrack" style="position: absolute; z-index: 1"></canvas>
                                             </div>
                                             <img id="capturedImage" class="captured-image" onclick="toggleCamera()" style="display: none;">
                                             <button  id="capture-button" onclick="captureImage(document.getElementById('videoPlayer'))" style="display: none">
