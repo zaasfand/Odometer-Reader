@@ -6,6 +6,33 @@
             /* To stack the text and icon vertically */
         }
         
+        #ovalOverlay {
+            display: none;
+            position: absolute;
+            width: 50%;
+            height: 66.67%;
+            border: 2px dashed black;
+            pointer-events: none;
+            border-radius: 50%;
+            box-sizing: border-box;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+        #rectangleOverlay{
+            position: absolute;
+            width: 80%;
+            height: 40%;
+            border: 2px dashed white;
+            pointer-events: none;
+            border-radius: 0%;
+            box-sizing: border-box;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
         .enter-mile-wrapper {
             display: flex;
             align-items: center;
@@ -258,8 +285,8 @@
         }
         
         .capture-btn-odo {
-            left: 16%;
-            bottom: 29.5%;
+            left: 15%;
+            bottom: 32.5%;
         }
         
         .image-preview {
